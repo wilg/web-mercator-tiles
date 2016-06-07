@@ -1,11 +1,11 @@
-module.exports = function(extent,z) {
+module.exports = function(extent,z,callback) {
   // web mercator projection extent
   var projExtent = {
       left: -20037508.342789244,
       right: 20037508.342789244,
       bottom: -20037508.342789244,
       top: 20037508.342789244
-    }, 
+    },
     //tile seize
     size = 256,
     // resolutions
@@ -20,23 +20,30 @@ module.exports = function(extent,z) {
     rX = Math.floor(rx/size),
     bY = Math.floor(by/size),
     tY = Math.floor(ty/size),
-    //top left tile position of top-left tile with respect to window/div 
+    //top left tile position of top-left tile with respect to window/div
     top = topStart = (tY * size) - ty,
     left = (lX * size) - lx,
     tiles = [];
   for (var i=lX; i<=rX; i++) {
     top = topStart;
     for(var j=tY; j<=bY; j++) {
-      tiles.push({
+      var tile = {
         X:i,
         Y:j,
         Z:z,
         top: top,
         left: left
-      });
+      };
+      if (callback) {
+        callback(tile);
+      } else {
+        tiles.push(tile);
+      }
       top +=size;
     }
     left +=size;
   }
-  return tiles;
+  if (!callback) {
+    return tiles;
+  }
 };
